@@ -1,8 +1,8 @@
 /**
  * Tracks a pageview to our "imaginary api"
  */
-export const trackPageview = async (params: TrackingParams) => {
-  await useFetch('/api/pageview', {
+export const trackPageview = (params: TrackingParams) => {
+  $fetch('/api/pageview', {
     method: 'POST',
     body: params,
   });
