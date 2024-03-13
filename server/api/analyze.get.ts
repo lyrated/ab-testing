@@ -23,32 +23,36 @@ interface AnalyzeResponse {
  * In this case since we only have one page, it is calculated for all pageview events.
  */
 export default defineEventHandler(async (event): Promise<AnalyzeResponse> => {
-  let result: CTRResponse[] = [];
-  const testedVariations = [VARIATION_CONTROL, VARIATION_TEST];
+  try {
+    let result: CTRResponse[] = [];
+    const testedVariations = [VARIATION_CONTROL, VARIATION_TEST];
 
-  const promise = testedVariations.map(async (variationName) => {
-    const pageViews = await countTrackingDataByVariation(
-      PAGEVIEW,
-      variationName
-    );
-    const clicks = await countTrackingDataByVariation(
-      SIGNUP_CLICK,
-      variationName
-    );
+    const promise = testedVariations.map(async (variationName) => {
+      const pageViews = await countTrackingDataByVariation(
+        PAGEVIEW,
+        variationName
+      );
+      const clicks = await countTrackingDataByVariation(
+        SIGNUP_CLICK,
+        variationName
+      );
 
-    result.push({
-      pageViews: pageViews.length,
-      eventName: variationName,
-      clicks: clicks.length,
-      ctr: clicks.length / pageViews.length,
+      result.push({
+        pageViews: pageViews.length,
+        eventName: variationName,
+        clicks: clicks.length,
+        ctr: clicks.length / pageViews.length,
+      });
     });
-  });
-  await Promise.all(promise);
+    await Promise.all(promise);
 
-  const sortedResult = result.sort((a, b) => a.ctr - b.ctr);
+    const sortedResult = result.sort((a, b) => a.ctr - b.ctr);
 
-  return {
-    winning: sortedResult[sortedResult.length - 1].eventName,
-    ctrs: result,
-  };
+    return {
+      winning: sortedResult[sortedResult.length - 1].eventName,
+      ctrs: result,
+    };
+  } catch (e: unknown) {
+    return { winning: '', ctrs: [] };
+  }
 });

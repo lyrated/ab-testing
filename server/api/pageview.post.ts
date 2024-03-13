@@ -5,14 +5,18 @@ import { Tracking } from '../models/tracking.model';
  */
 
 export default defineEventHandler(async (event) => {
-  const { userId, url, variation } = await readBody<TrackingParams>(event);
+  try {
+    const { userId, url, variation } = await readBody<TrackingParams>(event);
 
-  await Tracking.create({
-    userId: userId,
-    url: url,
-    eventName: 'pageview',
-    variation: variation,
-  });
+    await Tracking.create({
+      userId: userId,
+      url: url,
+      eventName: 'pageview',
+      variation: variation,
+    });
 
-  return { success: true };
+    return { success: true };
+  } catch (e: unknown) {
+    return { success: false };
+  }
 });

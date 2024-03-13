@@ -7,11 +7,15 @@ export const countTrackingDataByVariation = async (
   eventName: string,
   variationName: string
 ) => {
-  // In a bigger project, this should also be matched with url, but here we only have one url.
-  const data = await Tracking.aggregate([
-    { $match: { eventName: eventName, variation: variationName } },
-    { $group: { _id: '$userId' } },
-  ]);
+  try {
+    // In a bigger project, this should also be matched with url, but here we only have one url.
+    const data = await Tracking.aggregate([
+      { $match: { eventName: eventName, variation: variationName } },
+      { $group: { _id: '$userId' } },
+    ]);
 
-  return data;
+    return data;
+  } catch (e: unknown) {
+    return [];
+  }
 };
